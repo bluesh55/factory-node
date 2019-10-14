@@ -1,4 +1,4 @@
-# Factory
+# Factory (WIP)
 
 [![NPM version](https://img.shields.io/npm/v/@bluesh55/factory)](https://www.npmjs.com/package/@bluesh55/factory)
 
@@ -32,7 +32,7 @@ You can customize the config file if you want.
 // .factoryrc.json
 
 {
-   factoriesDir: './mytest/factories/'
+   "factoriesDir": "./mytest/factories/"
 }
 ```
 
