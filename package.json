@@ -2,14 +2,18 @@
   "name": "@bluesh55/factory",
   "version": "0.0.1",
   "description": "Factory library for creating some data from dynamic attributes which based on configuration",
-  "main": "src/index.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "factory": "./bin/cli.js"
   },
   "keywords": [
     "test",
     "factory"
   ],
   "author": "bluesh55",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {}
 }
