@@ -1,7 +1,7 @@
 {
   "name": "@bluesh55/factory",
   "version": "0.0.1",
-  "description": "Factory library for creating some data from dynamic attributes which based on configuration",
+  "description": "Factory is the library for creating data from pre-configured attribute specs.",
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
