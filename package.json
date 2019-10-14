@@ -1,6 +1,6 @@
 {
   "name": "@bluesh55/factory",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Factory is the library for creating data from pre-configured attribute specs.",
   "main": "src/app.js",
   "scripts": {
