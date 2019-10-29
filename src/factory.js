@@ -39,8 +39,10 @@ class Factory {
       }
 
       if (input !== undefined) {
-        if (spec.creator) {
-          generatedValue = await spec.creator(input);
+        if (spec.transform && spec.transform.constructor.name === 'AsyncFunction') {
+          generatedValue = await spec.transform(input);
+        } else if (spec.transform && spec.transform.constructor.name === 'Function') {
+          generatedValue = spec.transform(input);
         } else {
           generatedValue = input;
         }
@@ -61,8 +63,10 @@ class Factory {
           generatedValue = spec.defaultValue;
         }
 
-        if (spec.creator) {
-          generatedValue = await spec.creator(generatedValue);
+        if (spec.transform && spec.transform.constructor.name === 'AsyncFunction') {
+          generatedValue = await spec.transform(generatedValue);
+        } else if (spec.transform && spec.transform.constructor.name === 'Function') {
+          generatedValue = spec.transform(generatedValue);
         }
       }
 

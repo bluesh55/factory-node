@@ -62,7 +62,7 @@ module.exports = {
     password: {
       type: String,
       attributeName: 'encrypted_password',
-      creator: async (password) => {
+      transform: async (password) => {
         const encryptedPassword = await encryptPassword(password);
         return encryptedPassword;
       },
@@ -82,7 +82,7 @@ module.exports = {
       type: Boolean,
       defaultValue: false,
       attributeName: 'user_type',
-      creator: async (value) => {
+      transform: (value) => {
         const newValue = value ? 1: 0;
         return newValue;
       }
@@ -194,7 +194,7 @@ module.exports = {
     password: {
       type: String,
       attributeName: 'encrypted_password',
-      creator: async (password) => {
+      transform: async (password) => {
         const encryptedPassword = await encryptPassword(password);
         return encryptedPassword;
       },
@@ -214,7 +214,7 @@ module.exports = {
       type: Boolean,
       defaultValue: false,
       attributeName: 'user_type',
-      creator: async (value) => {
+      transform: (value) => {
         const newValue = value ? 1: 0;
         return newValue;
       }
@@ -231,8 +231,9 @@ module.exports = {
 If function or async function is given, defaultValue would be the value of the function returns and get the `seq` parameter.
 `seq` parameter is sequential number start from 0. This is good to use for uniqueness data.
 - **attributeName**: This is used if the name of attribute is different between spec and database.
-- **creator**: In some cases, maybe you want to transform value to something different. 
-In the above example, the `password` attribute has the `creator` to encrypt input value.
+- **transform**: In some cases, maybe you want to transform value to something different. 
+In the above example, the `password` attribute has the `transform` option to encrypt input value.
+It can be function or async function that gets old value as parameter. It have to return the transformed data.
 
 
 ### creator
