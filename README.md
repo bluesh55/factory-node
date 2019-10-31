@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/@bluesh55/factory)](https://www.npmjs.com/package/@bluesh55/factory)
 
-Factory is the library for creating data from pre-configured definition.
+Factory is the library for creating data from pre-configured model definition.
 It is good to use for testing purposes.
 
 This library is inspired by [FactoryBot](https://github.com/thoughtbot/factory_bot).
@@ -39,57 +39,31 @@ You can customize the config if you want.
 
 ##### Create test model
 
-Create your test model at the directory you specified above.
+Create your test model at the directory you configured above.
 
 ```js
-// `./mytest/factories/user.js`
-
-const { User } = require('../../db/models'); // Using Sequelize
-const { encryptPassword } = require('../../src/utils/crypto'); // To encrypt password
+// `./mytest/factories/person.js`
+const { Person } = require('../../db/models'); // use Sequelize
 
 module.exports = {
-  name: 'user',
+  name: 'person',
   specification: {
     id: {
       type: Number,
     },
-    email: {
+    name: {
       type: String,
       defaultValue: async (seq) => {
-        return `email${seq}@gmail.com`
-      }
-    },
-    password: {
-      type: String,
-      attributeName: 'encrypted_password',
-      transform: async (password) => {
-        const encryptedPassword = await encryptPassword(password);
-        return encryptedPassword;
-      },
-      defaultValue: 'password',
-    },
-    username: {
-      type: String,
-      defaultValue: async (seq) => {
-        return `username${seq}`
+        return `name{seq}`
       }
     },
     tel: {
       type: String,
       defaultValue: '010-1234-4321'
-    },
-    isAdmin: {
-      type: Boolean,
-      defaultValue: false,
-      attributeName: 'user_type',
-      transform: (value) => {
-        const newValue = value ? 1: 0;
-        return newValue;
-      }
     }
   },
-  creator: async (attributes) => {
-    return await User.create(attributes);
+  creator: (attributes) => {
+    return Person.create(attributes);
   }
 }
 ```
@@ -101,28 +75,22 @@ module.exports = {
 
 const { factory } = require('@bluesh55/factory');
 
-describe('User', () => {
+describe('Person', () => {
   beforeEach(async (done) => {
-    await factory.create('user', { password: '12345678' });
-    await factory.create('user', { username: 'Andrew', isAdmin: true });
+    await factory.create('person');
+    await factory.create('person', { name: 'Andrew' });
     /*
-       This will create the user in the database like this
+       This will create the person in the database like this
 
        {
           id: 1,
-          email: 'email0@gmail.com',
-          encrypted_password: '...(encrypted '12345678')',
-          tel: '010-1234-4321',
-          username: 'username0',
-          user_type: 0,
+          name: 'name0',
+          tel: '010-1234-4321'
        },
        {
           id: 2,
-          email: 'email1@gmail.com',
-          encrypted_password: '...(encrypted 'password')',
-          tel: '010-1234-4321',
-          username: 'Andrew',
-          user_type: 1,
+          name: 'Andrew',
+          tel: '010-1234-4321'
        }
      */
   });
@@ -148,7 +116,7 @@ describe('User', () => {
 ## Test model
 
 The test model is a definition of what you want to build and how to create to the database(or whatever).  
-It has some pre-defined options which be able to create data dynamically from static definition.
+It has some options which be able to create data dynamically from static definition.
 
 ### name
 
@@ -169,7 +137,7 @@ module.exports = {
 ```
 
 ```js
-// create mymodel
+// Create mymodel
 
 factory.create('mymodelname');
 ```
@@ -179,8 +147,10 @@ factory.create('mymodelname');
 `specification` is a complicated option that has some sub-options. See below example.
 
 ```js
+const { encryptPassword } = require('../utils/crypto'); // use custom crypto util to encrypt password
+
 module.exports = {
-  name: 'mymodel',
+  name: 'user',
   specification: {
     id: {
       type: Number,
@@ -241,7 +211,6 @@ It can be function or async function that gets old value as parameter. It have t
 The **Factory** delegates the data creation part to you. You can use Sequelize, Mongoose, whatever to save the data in database.  
 What you have to do is just defining `creator` function. If you define creator function, the Factory uses that when you call `create` method.  
 The `creator` function gets an `attributes` parameter that is derived from `specification`.
-And it must return created data if you want to use that in the test.
 
 ```js
 // Define creator function uses sequelize
@@ -258,6 +227,8 @@ module.exports = {
   }
 }
 ```
+
+And it must return created data if you want to use that in the test.
 
 ```js
 // And use in the test
