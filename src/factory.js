@@ -1,4 +1,12 @@
 class Factory {
+  static get ASYNC_FUNCTION_NAME() {
+    return 'AsyncFunction';
+  }
+
+  static get PLAIN_FUNCTION_NAME() {
+    return 'Function';
+  }
+
   constructor() {
     this.models = {};
   }
@@ -21,79 +29,74 @@ class Factory {
       model.sequences = {};
     }
 
-    // Remove empty attributes
+    // Remove all empty attributes
     Object.keys(attributes).forEach((key) => attributes[key] === undefined && delete attributes[key]);
 
-    for (const attributeName of Object.keys(model.attributesSpec)) {
-      const spec = model.attributesSpec[attributeName];
-      const input = attributes[attributeName];
+    for (const attributeKey of Object.keys(model.attributesSpec)) {
+      const spec = model.attributesSpec[attributeKey];
+      const input = attributes[attributeKey];
       let generatedValue = null;
       let newAttributeName = null;
 
-      if (!spec) {
-        continue;
-      }
+      // Guards
+      if (!spec) { continue; }
+      if (
+        input === undefined &&
+        (spec.defaultValue === undefined || spec.defaultValue === null)
+      ) { continue; }
 
       if (spec.attributeName) {
         newAttributeName = spec.attributeName;
       }
 
-      if (input !== undefined) {
-        if (spec.transform && spec.transform.constructor.name === 'AsyncFunction') {
-          generatedValue = await spec.transform(input);
-        } else if (spec.transform && spec.transform.constructor.name === 'Function') {
-          generatedValue = spec.transform(input);
-        } else {
-          generatedValue = input;
-        }
-      } else {
-        if (spec.defaultValue === undefined || spec.defaultValue === null) {
-          continue;
-        }
+      if (input) {
+        generatedValue = input;
+      }
 
-        if (spec.defaultValue.constructor.name === 'AsyncFunction') {
-          if (model.sequences[attributeName] === undefined) {
-            model.sequences[attributeName] = 0;
-          }
-
-          const sequenceNumber = model.sequences[attributeName];
-          generatedValue = await spec.defaultValue(sequenceNumber);
-          model.sequences[attributeName] += 1;
-        } else if (spec.defaultValue.constructor.name === 'Function') {
-          if (model.sequences[attributeName] === undefined) {
-            model.sequences[attributeName] = 0;
-          }
-
-          const sequenceNumber = model.sequences[attributeName];
-          generatedValue = spec.defaultValue(sequenceNumber);
-          model.sequences[attributeName] += 1;
+      // 1. Assign defaultValue to generatedValue when input is not given and defaultValue is given
+      if (input === undefined) {
+        if (this._isFunction(spec.defaultValue)) {
+          model.sequences[attributeKey] = model.sequences[attributeKey] || 0;
+          generatedValue = await this._doAsyncOrPlainFunction(spec.defaultValue, model.sequences[attributeKey]);
+          model.sequences[attributeKey] += 1;
         } else {
           generatedValue = spec.defaultValue;
         }
-
-        if (spec.transform && spec.transform.constructor.name === 'AsyncFunction') {
-          generatedValue = await spec.transform(generatedValue);
-        } else if (spec.transform && spec.transform.constructor.name === 'Function') {
-          generatedValue = spec.transform(generatedValue);
-        }
       }
 
+      // 2. Transform generatedValue if transform function is exists
+      if (spec.transform) {
+        generatedValue = await this._doAsyncOrPlainFunction(spec.transform, generatedValue);
+      }
+
+      // 3. Assign generatedValue that is result of above to `attributes`
       if (generatedValue) {
         if (newAttributeName) {
           attributes[newAttributeName] = generatedValue;
         } else {
-          attributes[attributeName] = generatedValue;
+          attributes[attributeKey] = generatedValue;
         }
       }
     }
 
-    if (this.models[modelName].creator.constructor.name === 'AsyncFunction') {
-      return await this.models[modelName].creator(attributes);
-    } else if (this.models[modelName].creator.constructor.name === 'Function') {
-      return this.models[modelName].creator(attributes);
-    }
+    // Now call creator function with attributes as parameter and return it
+    return await this._doAsyncOrPlainFunction(this.models[modelName].creator, attributes);
+  }
 
-    return;
+  async _doAsyncOrPlainFunction(func, ...params) {
+    switch(func.constructor.name) {
+      case Factory.ASYNC_FUNCTION_NAME:
+        return await func(...params);
+      case Factory.PLAIN_FUNCTION_NAME:
+        return func(...params);
+      default:
+        return undefined;
+    }
+  }
+
+  _isFunction(param) {
+    return param.constructor.name === Factory.ASYNC_FUNCTION_NAME ||
+      param.constructor.name === Factory.PLAIN_FUNCTION_NAME;
   }
 }
 
