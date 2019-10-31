@@ -13,8 +13,8 @@ fs.
     return (file.indexOf('.') !== 0) && (file.slice(-3) === '.js')
   }).
   forEach((file) => {
-    const { name, attributesSpec, creator } = require(path.join(Config.modelsDir, file));
+    const { name, specification, creator } = require(path.join(Config.modelsDir, file));
 
-    factory.addModel(name, attributesSpec, creator);
+    factory.addModel(name, specification, creator);
   });
 
