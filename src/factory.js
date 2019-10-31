@@ -11,14 +11,14 @@ class Factory {
     this.models = {};
   }
 
-  addModel(name, attributesSpec, creator) {
+  addModel(name, specification, creator) {
     this.models[name] = {
-      attributesSpec,
+      specification,
       creator
     };
   }
 
-  async create(modelName, attributes = {}) {
+  async create(modelName, inputAttributes = {}) {
     const model = this.models[modelName];
 
     if (!model) {
@@ -29,24 +29,24 @@ class Factory {
       model.sequences = {};
     }
 
-    // Remove all empty attributes
-    Object.keys(attributes).forEach((key) => attributes[key] === undefined && delete attributes[key]);
+    // Remove all empty inputAttributes
+    Object.keys(inputAttributes).forEach((key) => inputAttributes[key] === undefined && delete inputAttributes[key]);
 
-    for (const attributeKey of Object.keys(model.attributesSpec)) {
-      const spec = model.attributesSpec[attributeKey];
-      const input = attributes[attributeKey];
+    for (const attributeKey of Object.keys(model.specification)) {
+      const attributeSpec = model.specification[attributeKey];
+      const input = inputAttributes[attributeKey];
       let generatedValue = null;
       let newAttributeName = null;
 
       // Guards
-      if (!spec) { continue; }
+      if (!attributeSpec) { continue; }
       if (
         input === undefined &&
-        (spec.defaultValue === undefined || spec.defaultValue === null)
+        (attributeSpec.defaultValue === undefined || attributeSpec.defaultValue === null)
       ) { continue; }
 
-      if (spec.attributeName) {
-        newAttributeName = spec.attributeName;
+      if (attributeSpec.attributeName) {
+        newAttributeName = attributeSpec.attributeName;
       }
 
       if (input) {
@@ -55,32 +55,32 @@ class Factory {
 
       // 1. Assign defaultValue to generatedValue when input is not given and defaultValue is given
       if (input === undefined) {
-        if (this._isFunction(spec.defaultValue)) {
+        if (this._isFunction(attributeSpec.defaultValue)) {
           model.sequences[attributeKey] = model.sequences[attributeKey] || 0;
-          generatedValue = await this._doAsyncOrPlainFunction(spec.defaultValue, model.sequences[attributeKey]);
+          generatedValue = await this._doAsyncOrPlainFunction(attributeSpec.defaultValue, model.sequences[attributeKey]);
           model.sequences[attributeKey] += 1;
         } else {
-          generatedValue = spec.defaultValue;
+          generatedValue = attributeSpec.defaultValue;
         }
       }
 
       // 2. Transform generatedValue if transform function is exists
-      if (spec.transform) {
-        generatedValue = await this._doAsyncOrPlainFunction(spec.transform, generatedValue);
+      if (attributeSpec.transform) {
+        generatedValue = await this._doAsyncOrPlainFunction(attributeSpec.transform, generatedValue);
       }
 
-      // 3. Assign generatedValue that is result of above to `attributes`
+      // 3. Assign generatedValue that is result of above to `inputAttributes`
       if (generatedValue) {
         if (newAttributeName) {
-          attributes[newAttributeName] = generatedValue;
+          inputAttributes[newAttributeName] = generatedValue;
         } else {
-          attributes[attributeKey] = generatedValue;
+          inputAttributes[attributeKey] = generatedValue;
         }
       }
     }
 
-    // Now call creator function with attributes as parameter and return it
-    return await this._doAsyncOrPlainFunction(this.models[modelName].creator, attributes);
+    // Now call creator function with inputAttributes as parameter and return it
+    return await this._doAsyncOrPlainFunction(this.models[modelName].creator, inputAttributes);
   }
 
   async _doAsyncOrPlainFunction(func, ...params) {

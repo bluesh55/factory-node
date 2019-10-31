@@ -49,8 +49,8 @@ describe('Factory', () => {
     // End of creator
 
 
-    // Start of attributesSpec
-    describe('attributesSpec', () => {
+    // Start of specification
+    describe('specification', () => {
       describe('attributeName', () => {
         beforeEach(() => {
           sut = new Factory();
@@ -182,6 +182,6 @@ describe('Factory', () => {
 
       });
     });
-    // End of attributesSpec
+    // End of specification
   });
 });

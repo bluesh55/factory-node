@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/@bluesh55/factory)](https://www.npmjs.com/package/@bluesh55/factory)
 
-Factory is the library for creating data from pre-configured attribute specs.
+Factory is the library for creating data from pre-configured definition.
 It is good to use for testing purposes.
 
 This library is inspired by [FactoryBot](https://github.com/thoughtbot/factory_bot).
@@ -48,8 +48,8 @@ const { User } = require('../../db/models'); // Using Sequelize
 const { encryptPassword } = require('../../src/utils/crypto'); // To encrypt password
 
 module.exports = {
-  name: 'user', // You can use this name for `factory.create('user');`
-  attributesSpec: {
+  name: 'user',
+  specification: {
     id: {
       type: Number,
     },
@@ -158,8 +158,8 @@ The test model's name for creating.
 // Define mymodel
 
 module.exports = {
-  name: 'mymodel',
-  attributesSpec: {
+  name: 'mymodelname',
+  specification: {
     ...
   },
   creator: async (attributes) => {
@@ -171,17 +171,17 @@ module.exports = {
 ```js
 // create mymodel
 
-factory.create('mymodel');
+factory.create('mymodelname');
 ```
 
-### attributesSpec
+### specification
 
-`attributesSpec` is a complicated option that has some sub-options. See below example.
+`specification` is a complicated option that has some sub-options. See below example.
 
 ```js
 module.exports = {
   name: 'mymodel',
-  attributesSpec: {
+  specification: {
     id: {
       type: Number,
     },
@@ -229,8 +229,8 @@ module.exports = {
 - **type**: The type of data. There is nothing using this option yet. Just specification.
 - **defaultValue**: This is used as a default value if you don't specify attribute when call `create` method.  
 If function or async function is given, defaultValue would be the value of the function returns and get the `seq` parameter.
-`seq` parameter is sequential number start from 0. This is good to use for uniqueness data.
-- **attributeName**: This is used if the name of attribute is different between spec and database.
+The `seq` parameter is sequential number start from 0. This is good to use for uniqueness data.
+- **attributeName**: This is used if the name of attribute is different between specification key and database column name.
 - **transform**: In some cases, maybe you want to transform value to something different. 
 In the above example, the `password` attribute has the `transform` option to encrypt input value.
 It can be function or async function that gets old value as parameter. It have to return the transformed data.
@@ -239,14 +239,18 @@ It can be function or async function that gets old value as parameter. It have t
 ### creator
 
 The **Factory** delegates the data creation part to you. You can use Sequelize, Mongoose, whatever to save the data in database.  
-What you have to do is just defining `creator` function. If you define creator function, the Factory uses that when you call `create` method.
+What you have to do is just defining `creator` function. If you define creator function, the Factory uses that when you call `create` method.  
+The `creator` function gets an `attributes` parameter that is derived from `specification`.
+And it must return created data if you want to use that in the test.
 
 ```js
+// Define creator function uses sequelize
+
 const { MyModel } = require('../../db/models'); // require Sequelize instance
 
 module.exports = {
   name: 'mymodel',
-  attributesSpec: {
+  specification: {
     ...
   },
   creator: async (attributes) => {
@@ -256,11 +260,19 @@ module.exports = {
 ```
 
 ```js
-factory.create('mymodel');
+// And use in the test
+describe('...', () => {
+  let mymodel;
+
+  beforeEach(async (done) => {
+    mymodel = await factory.create('mymodel');
+    done();
+  });
+
+  ...
+})
 ```
 
-The `creator` function gets an `attributes` parameter that is derived from `attributesSpec`.
-And it must return created data if you want to use that in the test.
 
 ## License
 
