@@ -59,6 +59,14 @@ class Factory {
           const sequenceNumber = model.sequences[attributeName];
           generatedValue = await spec.defaultValue(sequenceNumber);
           model.sequences[attributeName] += 1;
+        } else if (spec.defaultValue.constructor.name === 'Function') {
+          if (model.sequences[attributeName] === undefined) {
+            model.sequences[attributeName] = 0;
+          }
+
+          const sequenceNumber = model.sequences[attributeName];
+          generatedValue = spec.defaultValue(sequenceNumber);
+          model.sequences[attributeName] += 1;
         } else {
           generatedValue = spec.defaultValue;
         }
@@ -79,7 +87,13 @@ class Factory {
       }
     }
 
-    return await this.models[modelName].creator(attributes);
+    if (this.models[modelName].creator.constructor.name === 'AsyncFunction') {
+      return await this.models[modelName].creator(attributes);
+    } else if (this.models[modelName].creator.constructor.name === 'Function') {
+      return this.models[modelName].creator(attributes);
+    }
+
+    return;
   }
 }
 

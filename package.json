@@ -4,7 +4,7 @@
   "description": "Factory is the library for creating data from pre-configured attribute specs.",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx jest --runInBand"
   },
   "bin": {
     "factory": "./bin/cli.js"
@@ -15,5 +15,8 @@
   ],
   "author": "bluesh55",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
 }
