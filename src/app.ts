@@ -19,7 +19,7 @@ fs.readdirSync(config.modelsDir)
     const extension = file.slice(-3)
     return file.indexOf('.') !== 0 && ['.js', '.ts'].includes(extension)
   })
-  .forEach(async file => {
+  .forEach(file => {
     const extension = file.slice(-3)
 
     let model: {
