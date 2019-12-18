@@ -1,10 +1,12 @@
 declare class Configuration {
-    fileName: string;
+    configFileName: string;
     configTemplate: string;
     modelsDir: string;
+    tsConfig: any;
     constructor();
     initialize(): string;
-    load(basePath?: string[]): boolean | undefined;
+    load(): boolean;
+    loadModelsDir(basePath?: string[]): boolean | undefined;
 }
 declare const config: Configuration;
 export default config;

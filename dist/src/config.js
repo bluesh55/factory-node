@@ -14,19 +14,26 @@ var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var Configuration = /** @class */ (function () {
     function Configuration() {
-        this.fileName = '.factoryrc.json';
+        this.configFileName = '.factoryrc.json';
         this.configTemplate = "{\n  \"modelsDir\": \"./tests/factories/\"\n}";
         this.modelsDir = '';
     }
     Configuration.prototype.initialize = function () {
-        var filePath = path_1.default.resolve('.', this.fileName);
+        var filePath = path_1.default.resolve('.', this.configFileName);
         var absoluteDir = path_1.default.dirname(filePath);
         fs_1.default.writeFileSync(filePath, this.configTemplate, 'utf8');
         return absoluteDir;
     };
-    Configuration.prototype.load = function (basePath) {
+    Configuration.prototype.load = function () {
+        var isModelsDirLoaded = this.loadModelsDir();
+        if (!isModelsDirLoaded) {
+            throw new Error('Models directory does not exist');
+        }
+        return true;
+    };
+    Configuration.prototype.loadModelsDir = function (basePath) {
         if (basePath === void 0) { basePath = ['.']; }
-        var filePath = path_1.default.resolve.apply(path_1.default, __spreadArrays(basePath, [this.fileName]));
+        var filePath = path_1.default.resolve.apply(path_1.default, __spreadArrays(basePath, [this.configFileName]));
         if (fs_1.default.existsSync(filePath)) {
             var config_1 = JSON.parse(fs_1.default.readFileSync(filePath, 'utf8'));
             var modelsDir = path_1.default.resolve.apply(path_1.default, __spreadArrays(basePath, [config_1.modelsDir]));
@@ -34,11 +41,11 @@ var Configuration = /** @class */ (function () {
             return true;
         }
         else {
-            if (filePath === path_1.default.resolve('/', this.fileName)) {
+            if (filePath === path_1.default.resolve('/', this.configFileName)) {
                 return false;
             }
             else {
-                this.load(__spreadArrays(basePath, ['..']));
+                this.loadModelsDir(__spreadArrays(basePath, ['..']));
             }
         }
     };
