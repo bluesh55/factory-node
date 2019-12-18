@@ -8,7 +8,7 @@ declare class Factory {
     models: ModelStorage;
     constructor();
     addModel(name: string, specification: Specification, creator: Function): void;
-    create(modelName: string, inputAttributes: AnyObject): Promise<any>;
+    create(modelName: string, attrs?: AnyObject): Promise<any>;
     _doAsyncOrPlainFunction(func: Function, ...params: any[]): Promise<any>;
     _isFunction(param: any): boolean;
 }

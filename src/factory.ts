@@ -26,9 +26,9 @@ class Factory {
     }
   }
 
-  async create(modelName: string, inputAttributes: AnyObject) {
+  async create(modelName: string, attrs?: AnyObject) {
     const model = this.models[modelName]
-    inputAttributes = inputAttributes || {}
+    const inputAttributes = attrs || {}
 
     if (!model) {
       return

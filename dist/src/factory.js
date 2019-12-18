@@ -60,14 +60,14 @@ var Factory = /** @class */ (function () {
             creator: creator,
         };
     };
-    Factory.prototype.create = function (modelName, inputAttributes) {
+    Factory.prototype.create = function (modelName, attrs) {
         return __awaiter(this, void 0, void 0, function () {
-            var model, _i, _a, attributeKey, attributeSpec, input, generatedValue, newAttributeName;
+            var model, inputAttributes, _i, _a, attributeKey, attributeSpec, input, generatedValue, newAttributeName;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         model = this.models[modelName];
-                        inputAttributes = inputAttributes || {};
+                        inputAttributes = attrs || {};
                         if (!model) {
                             return [2 /*return*/];
                         }
