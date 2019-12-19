@@ -12,4 +12,5 @@ declare class Factory {
     _doAsyncOrPlainFunction(func: Function, ...params: any[]): Promise<any>;
     _isFunction(param: any): boolean;
 }
-export default Factory;
+export declare const factory: Factory;
+export {};

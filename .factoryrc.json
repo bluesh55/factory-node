@@ -1,3 +1,4 @@
 {
-  "modelsDir": "./tests/factories/"
+  "modelsDir": "./tests/factories/",
+  "loaderDir": "./tests/helpers"
 }

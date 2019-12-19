@@ -4,9 +4,10 @@ declare class Configuration {
     modelsDir: string;
     tsConfig: any;
     constructor();
-    initialize(): string;
+    initializeConfigFile(): string;
+    initializeLoader(isTypescript: boolean): string;
     load(): boolean;
     loadModelsDir(basePath?: string[]): boolean | undefined;
 }
-declare const config: Configuration;
-export default config;
+export declare const config: Configuration;
+export {};

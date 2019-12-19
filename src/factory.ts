@@ -122,4 +122,4 @@ class Factory {
   }
 }
 
-export default Factory
+export const factory = new Factory()

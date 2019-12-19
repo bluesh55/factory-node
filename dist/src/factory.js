@@ -165,4 +165,4 @@ var Factory = /** @class */ (function () {
     };
     return Factory;
 }());
-exports.default = Factory;
+exports.factory = new Factory();
