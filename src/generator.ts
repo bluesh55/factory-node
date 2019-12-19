@@ -22,7 +22,7 @@ fs.readdirSync(configuration.modelsDir)
     } = {}
 
     const modelFilePath = path.join(configuration.modelsDir, file)
-    model = require(modelFilePath)
+    model = require(modelFilePath).default
     factory.addModel(model.name!, model.specification!, model.creator!)
   })
 `
