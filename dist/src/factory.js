@@ -62,7 +62,7 @@ var Factory = /** @class */ (function () {
     };
     Factory.prototype.create = function (modelName, attrs) {
         return __awaiter(this, void 0, void 0, function () {
-            var model, inputAttributes, _i, _a, attributeKey, attributeSpec, input, generatedValue, newAttributeName;
+            var model, inputAttributes, _i, _a, attributeKey, attributeSpec, hasInput, input, generatedValue, newAttributeName;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -79,40 +79,42 @@ var Factory = /** @class */ (function () {
                         _i = 0, _a = Object.keys(model.specification);
                         _b.label = 1;
                     case 1:
-                        if (!(_i < _a.length)) return [3 /*break*/, 8];
+                        if (!(_i < _a.length)) return [3 /*break*/, 9];
                         attributeKey = _a[_i];
                         attributeSpec = model.specification[attributeKey];
+                        hasInput = Object.keys(inputAttributes).includes(attributeKey);
                         input = inputAttributes[attributeKey];
                         generatedValue = null;
                         newAttributeName = null;
                         // Guards
                         if (!attributeSpec) {
-                            return [3 /*break*/, 7];
+                            return [3 /*break*/, 8];
                         }
                         if (attributeSpec.attributeName) {
                             newAttributeName = attributeSpec.attributeName;
                         }
-                        if (input) {
-                            generatedValue = input;
-                        }
-                        if (!(input === undefined)) return [3 /*break*/, 4];
-                        if (!this._isFunction(attributeSpec.defaultValue)) return [3 /*break*/, 3];
+                        if (!hasInput) return [3 /*break*/, 2];
+                        // when input is given
+                        generatedValue = input;
+                        return [3 /*break*/, 5];
+                    case 2:
+                        if (!this._isFunction(attributeSpec.defaultValue)) return [3 /*break*/, 4];
                         model.sequences[attributeKey] = model.sequences[attributeKey] || 0;
                         return [4 /*yield*/, this._doAsyncOrPlainFunction(attributeSpec.defaultValue, model.sequences[attributeKey])];
-                    case 2:
+                    case 3:
                         generatedValue = _b.sent();
                         model.sequences[attributeKey] += 1;
-                        return [3 /*break*/, 4];
-                    case 3:
-                        generatedValue = attributeSpec.defaultValue;
-                        _b.label = 4;
+                        return [3 /*break*/, 5];
                     case 4:
-                        if (!attributeSpec.transform) return [3 /*break*/, 6];
-                        return [4 /*yield*/, this._doAsyncOrPlainFunction(attributeSpec.transform, generatedValue)];
+                        generatedValue = attributeSpec.defaultValue;
+                        _b.label = 5;
                     case 5:
-                        generatedValue = _b.sent();
-                        _b.label = 6;
+                        if (!attributeSpec.transform) return [3 /*break*/, 7];
+                        return [4 /*yield*/, this._doAsyncOrPlainFunction(attributeSpec.transform, generatedValue)];
                     case 6:
+                        generatedValue = _b.sent();
+                        _b.label = 7;
+                    case 7:
                         // 3. Assign generatedValue that is result of above to `inputAttributes`
                         if (newAttributeName) {
                             inputAttributes[newAttributeName] = generatedValue;
@@ -120,12 +122,12 @@ var Factory = /** @class */ (function () {
                         else {
                             inputAttributes[attributeKey] = generatedValue;
                         }
-                        _b.label = 7;
-                    case 7:
+                        _b.label = 8;
+                    case 8:
                         _i++;
                         return [3 /*break*/, 1];
-                    case 8: return [4 /*yield*/, this._doAsyncOrPlainFunction(this.models[modelName].creator, inputAttributes)];
-                    case 9: 
+                    case 9: return [4 /*yield*/, this._doAsyncOrPlainFunction(this.models[modelName].creator, inputAttributes)];
+                    case 10: 
                     // Now call creator function with inputAttributes as parameter and return it
                     return [2 /*return*/, _b.sent()];
                 }
@@ -165,4 +167,5 @@ var Factory = /** @class */ (function () {
     };
     return Factory;
 }());
+exports.Factory = Factory;
 exports.factory = new Factory();

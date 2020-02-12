@@ -2,9 +2,9 @@ import { ModelStorage, Specification } from './model';
 declare type AnyObject = {
     [index: string]: any;
 };
-declare class Factory {
-    static get ASYNC_FUNCTION_NAME(): string;
-    static get PLAIN_FUNCTION_NAME(): string;
+export declare class Factory {
+    static readonly ASYNC_FUNCTION_NAME: string;
+    static readonly PLAIN_FUNCTION_NAME: string;
     models: ModelStorage;
     constructor();
     addModel(name: string, specification: Specification, creator: Function): void;
