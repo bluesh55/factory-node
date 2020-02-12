@@ -4,7 +4,7 @@ type AnyObject = {
   [index: string]: any
 }
 
-class Factory {
+export class Factory {
   static get ASYNC_FUNCTION_NAME() {
     return 'AsyncFunction'
   }
@@ -45,6 +45,7 @@ class Factory {
 
     for (const attributeKey of Object.keys(model.specification)) {
       const attributeSpec: Attribute = model.specification[attributeKey]
+      const hasInput = Object.keys(inputAttributes).includes(attributeKey)
       const input = inputAttributes[attributeKey]
       let generatedValue: any | null = null
       let newAttributeName: string | null = null
@@ -58,12 +59,12 @@ class Factory {
         newAttributeName = attributeSpec.attributeName
       }
 
-      if (input) {
+      // 1. Assign input or defaultValue to generatedValue
+      if (hasInput) {
+        // when input is given
         generatedValue = input
-      }
-
-      // 1. Assign defaultValue to generatedValue when input is not given and defaultValue is given
-      if (input === undefined) {
+      } else {
+        // when input is not given
         if (this._isFunction(attributeSpec.defaultValue)) {
           model.sequences[attributeKey] = model.sequences[attributeKey] || 0
           generatedValue = await this._doAsyncOrPlainFunction(
